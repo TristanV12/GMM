@@ -44,6 +44,7 @@ def likelihoodRUM(Data, parameter, dist = "exp", range_var = None, res = None, r
     if dist == "norm" or dist == "norm.fixedvariance":
         for i in range(0, n):
             if (Data[i,] == 0).sum() > 0:
+                print("if")
                 mj = (rank[i,] == 0).min() - 1
                 CDF = ones((1,len(x)), Float)
                 if not race:
@@ -55,10 +56,9 @@ def likelihoodRUM(Data, parameter, dist = "exp", range_var = None, res = None, r
                 ll = math.log(CDF[len(x)]) + ll
             else:
                 CDF = np.ones((1,len(x)), int)
-                for j in range(m, 1):
-                    PDF = norm.pdf(x, loc=parameter["Mean"][int(rank[i]) - 1],scale=parameter["SD"][int(rank[i]) - 1])
+                for j in range(m - 1, -1,-1):
+                    PDF = norm.pdf(x, loc=parameter["Mean"][rank[i, j] - 1],scale=parameter["SD"][rank[i, j] - 1])*CDF
                     CDF = res * PDF.cumsum()
-                print(CDF)
                 ll = math.log(CDF[len(x) - 1]) + ll
     return ll
 
