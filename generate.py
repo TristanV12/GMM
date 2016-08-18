@@ -68,19 +68,17 @@ def Breaking(Data):
     rows = Data.shape[0]
     cols = Data.shape[1]
     count = 0
-    print(rows*cols*(cols - 1) / 2)
     final = np.zeros((int(rows*cols*(cols - 1) / 2), 4), int)
     for i in range(0,len(Data)):
         current_list = Data[i]
         for j in range(0, len(current_list)):
             for k in range(j + 1, len(current_list)):
-                print(count)
                 final[count, 0] = current_list[j]
                 final[count, 1] = current_list[k]
                 final[count, 2] = k - j
                 final[count, 3] = i + 1
                 count = count + 1
-    print(final)
+    return final
 #     m = Data.shape[1]
   
 #   pair_full <- function(rankings) pair.top.k(rankings, length(rankings))

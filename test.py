@@ -9,5 +9,6 @@ if __name__ == '__main__':
 	Data = np.array([[2,4,3,1],[4,1,3,2]])
 	print(Data)
 	print(Params)
-	Breaking(Data)
 	print(likelihoodRUM(Data,Params, "norm"))
+	Data = Breaking(Data)
+	EstimationNormalGMM(Data, 4)

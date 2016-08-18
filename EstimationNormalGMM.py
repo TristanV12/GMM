@@ -1,4 +1,8 @@
 from scipy.stats import norm
+import time
+import numpy as np
+import pytz
+import pandas as pd
 
 def delta(Mu, SD=0, Var=False):
     m=length(Mu)
@@ -72,14 +76,15 @@ def generateC(DataPairs, m, weighted = False, prior = 0, normalized = True):
         arr.append(m)
     for y in range(0, m):
         full_arr.append(arr)
-    
+    diag = np.zeros((m, m), int)
+    np.fill_diagonal(diag,1)
     # C is the transition matrix, where C[i, j] denotes the number of times that
-    C = np.matrix(full_arr) - prior * m * np.zeros((m, m), int).fill_diagonal(1)
+    C = np.matrix(full_arr) - prior * m * diag
   
-    pairsDF = pd.DataFrame(Data.pairs)
+    pairsDF = pd.DataFrame(DataPairs)
   
     if pairsDF.shape[1] > 2:
-        pairsDF.columns = ["i", "j", "r"]
+        pairsDF.columns = ["i", "j", "d", "r"]
         C_wide = pairsDF.groupby("i", "j").summarize()
     else:
         pairsDF.columns = ["i", "j"]
@@ -118,8 +123,8 @@ def EstimationNormalGMM(DataPairs, m, iter=1000, Var=False, prior=0):
     
     t0 = time.time() #get starting time
   
-    sdhat = ones((1,m), int)
-    muhat = ones((1,m), int)
+    sdhat = np.ones((1,m), int)
+    muhat = np.ones((1,m), int)
     C = generateC(DataPairs, m, prior)
 
     if not Var:
