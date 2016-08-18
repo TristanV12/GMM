@@ -7,8 +7,9 @@ import pandas as pd
 
 def delta(Mu, SD=0, Var=False):
     Mu = Mu[0]
+    print("Mu", Mu)
     m=len(Mu)
-    A=np.zeros((m,m), int)
+    A=np.zeros((m,m), float)
 
     if not Var:
         for i in range(0,m):
@@ -24,7 +25,7 @@ def delta(Mu, SD=0, Var=False):
 def f(Mu, SD=0, Var = False):
     Mu = Mu[0]
     m=len(Mu)
-    A=np.zeros((m,m), int)
+    A=np.zeros((m,m), float)
     if not Var:
         for i in range(0,m):
             for j in range(0,m):
@@ -113,8 +114,8 @@ def EstimationNormalGMM(DataPairs, m, itr=1000, Var=False, prior=0):
     
     t0 = time.time() #get starting time
   
-    sdhat = np.ones((1,m), int)
-    muhat = np.ones((1,m), int)
+    sdhat = np.ones((1,m), float)
+    muhat = np.ones((1,m), float)
     C = generateC(DataPairs, m, prior)
 
     if not Var:

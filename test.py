@@ -11,4 +11,4 @@ if __name__ == '__main__':
 	# print(Params)
 	#print(likelihoodRUM(Data,Params, "norm"))
 	Data = Breaking(Data)
-	EstimationNormalGMM(Data, 4, itr=2)
+	print(EstimationNormalGMM(Data, 4, itr=2))
