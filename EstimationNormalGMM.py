@@ -1,38 +1,41 @@
-from scipy.stats import norm
+from scipy.stats import norm, rankdata
 import time
+import math
 import numpy as np
 import pytz
 import pandas as pd
 
 def delta(Mu, SD=0, Var=False):
-    m=length(Mu)
-    A=zeros((m,m), int)
+    Mu = Mu[0]
+    m=len(Mu)
+    A=np.zeros((m,m), int)
 
     if not Var:
-        for i in range(1,m + 1):
-            for j in range(1,m + 1):
+        for i in range(0,m):
+            for j in range(0,m):
                 A[i,j]=Mu[i]-Mu[j]
     if Var:
-        for i in range(1,m+1):
-            for j in range(1,m+1):
+        for i in range(0,m):
+            for j in range(0,m):
                 A[i,j]=2**.5*(Mu[i]-Mu[j])/(SD[i]**2+SD[j]**2)**.5
+    # print(A)
     return A
 
 def f(Mu, SD=0, Var = False):
-    m=length(Mu)
-    A=zeros((m,m), int)
+    Mu = Mu[0]
+    m=len(Mu)
+    A=np.zeros((m,m), int)
     if not Var:
-        for i in range(1,m+1):
-            for j in range(1,m+1):
-                A[i,j]=pnorm(Mu[i]-Mu[j],0,sqrt(2))
-
-        # diag(A)=1-colSums(A)
+        for i in range(0,m):
+            for j in range(0,m):
+                A[i,j]=norm.cdf(Mu[i]-Mu[j],loc=0,scale=math.sqrt(2))
+        np.fill_diagonal(A, 1-np.sum(A, axis=0))
   
     if Var:
         for i in range(0,m):
             for j in range(0,m):
-                A[i,j]=pnorm(Mu[i]-Mu[j],0,sd=sqrt(SD[i]^2+SD[j]^2))
-        # diag(A)=1-colSums(A);
+                A[i,j]=norm.cdf(Mu[i]-Mu[j],0,scale=math.sqrt(SD[i]**2+SD[j]**2))
+        np.fill_diagonal(A, 1-np.sum(A, axis=0))
     np.fill_diagonal(A,0)
     return A
 
@@ -70,36 +73,23 @@ def normalizeC(C):
 #' Data.Test.pairs <- Breaking(Data.Test, "full")
 #' generateC(Data.Test.pairs, 5)
 def generateC(DataPairs, m, weighted = False, prior = 0, normalized = True):
-    arr = []
-    full_arr = []
-    for x in range(0, m):
-        arr.append(m)
-    for y in range(0, m):
-        full_arr.append(arr)
     diag = np.zeros((m, m), int)
     np.fill_diagonal(diag,1)
     # C is the transition matrix, where C[i, j] denotes the number of times that
-    C = np.matrix(full_arr) - prior * m * diag
+    C = np.zeros((m, m), int) - prior * m * diag
   
-    pairsDF = pd.DataFrame(DataPairs)
+    # pairsDF = pd.DataFrame(DataPairs)
   
-    if pairsDF.shape[1] > 2:
-        pairsDF.columns = ["i", "j", "d", "r"]
-        C_wide = pairsDF.groupby("i", "j").summarize()
-    else:
-        pairsDF.columns = ["i", "j"]
-        C_wide = pairsDF.groupby("i", "j").summarize()
+    # if pairsDF.shape[1] > 2:
+    #     pairsDF.columns = ["i", "j", "d", "r"]
+    #     print(pairsDF)
+    # else:
+    #     pairsDF.columns = ["i", "j"]
+    #     C_wide = pairsDF.groupby("i", "j").summarize()
   
-    for l in range(1,C_wide.shape[0]):
-        # i wins, j loses
-        i = C_wide[l, "i"]
-        j = C_wide[l, "j"]
-        if C_wide.shape[1] > 2 and weighted: 
-            C[i, j] = C[i, j] + C_wide[l, "r"]
-        else:
-            C[i, j] = C[i, j] + C_wide[l, "n"]
+    for i in DataPairs:
+        C[i[0] - 1, i[1] - 1] += 1
 
-  
     if normalized:
         return normalizeC(C)
     else:
@@ -110,7 +100,7 @@ def generateC(DataPairs, m, weighted = False, prior = 0, normalized = True):
 #' 
 #' @param Data.pairs data broken up into pairs
 #' @param m number of alternatives
-#' @param iter number of iterations to run
+#' @param itr number of itrations to run
 #' @param Var indicator for difference variance (default is FALSE)
 #' @param prior magnitude of fake observations input into the model
 #' @return Estimated mean parameters for distribution of underlying normal (variance is fixed at 1)
@@ -119,7 +109,7 @@ def generateC(DataPairs, m, weighted = False, prior = 0, normalized = True):
 #' data(Data.Test)
 #' Data.Test.pairs <- Breaking(Data.Test, "full")
 #' Estimation.Normal.GMM(Data.Test.pairs, 5)
-def EstimationNormalGMM(DataPairs, m, iter=1000, Var=False, prior=0):
+def EstimationNormalGMM(DataPairs, m, itr=1000, Var=False, prior=0):
     
     t0 = time.time() #get starting time
   
@@ -128,27 +118,24 @@ def EstimationNormalGMM(DataPairs, m, iter=1000, Var=False, prior=0):
     C = generateC(DataPairs, m, prior)
 
     if not Var:
-        for iter in range(0,iter):
-            alpha = 1/iter
-            df.sum(axis=1)
-            muhat = muhat + alpha *(exp(-delta(muhat)**2/4)*(C - f(muhat))).sum(axis=1)
+        for itr in range(1,itr + 1):
+            alpha = 1/itr
+            muhat = muhat + alpha *(np.exp((-delta(muhat)**2)/4)*(C - f(muhat))).sum(axis=1)
+            print(-delta(muhat))
             muhat = muhat - muhat.min()
-        print(((C - f(muhat)).sum() **2)**.5)
   
     if Var:
-        for iter in range(0,iter):
-            alpha = 1/iter
-            muhat = muhat + alpha *(exp(-delta(muhat,sdhat,Var=TRUE)^2/4)*(C - f(muhat,sdhat,Var=TRUE))).sum(axis=1)
-            sdhat = abs(sdhat - alpha *rowSums(VarMatrix(sdhat)^(-2)*exp(-delta(muhat,sdhat,Var=TRUE)^2/4)*(C - f(muhat,sdhat,Var=TRUE))))
+        for itr in range(1,itr + 1):
+            alpha = 1/itr
+            muhat = muhat + alpha *(exp(-delta(muhat,sdhat,Var=Var)^2/4)*(C - f(muhat,sdhat,Var=Var))).sum(axis=1)
+            sdhat = abs(sdhat - alpha *rowSums(VarMatrix(sdhat)^(-2)*exp(-delta(muhat,sdhat,Var=Var)^2/4)*(C - f(muhat,sdhat,Var=TRUE))))
             muhat = muhat - muhat.min()
             sdhat[1] = 1
-        print(sum((C - f(muhat,sdhat,Var=True))^2)^.5)
   
     t = time.time() - t0
   
-    params = rep(list(list()), m)
-    for i in range(1,m):
-        params[[i]]["Mean"] = muhat[1, i]
-        params[[i]]["SD"] = sdhat[1, i]
-
-    return list(m = m, order = order(-muhat[1,]), Mean = muhat[1,], SD = sdhat[1,], Time = t, Parameters = params)
+    params = []
+    for i in range(0,m):
+        params.append(dict(Mean = muhat[0, i], SD = sdhat[0, i]))
+    # print(dict(m = m, order = rankdata(-muhat[0,]), Mean = muhat[0,], SD = sdhat[0,], Time = t, Parameters = params))
+    return dict(m = m, order = rankdata(-muhat[0,]), Mean = muhat[0,], SD = sdhat[0,], Time = t, Parameters = params)
