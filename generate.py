@@ -2,8 +2,11 @@ import numpy as np
 from scipy.stats import rankdata
 
 def GenerateRUMParameters(m, distribution):
+    arr = []
+    for i in range(0, m):
+        arr.append(.1)
     if distribution=='normal':
-        parameter = dict(m = m, Mean = np.random.uniform(0,1,(m,)), SD = np.random.uniform(0,1,(m,)))
+        parameter = dict(m = m, Mean = np.random.uniform(0,1,(m,)), SD = np.array(arr))
     elif distribution=='exponential':
         unscaled = random.uniform(0,1,(m,))
         parameter = dict(m = m, Mean = unscaled/unscaled.sum())
@@ -32,9 +35,8 @@ def GenerateRUMData(Params, m, n, distribution):
         return np.transpose(np.repeat(rankdata(np.random.exponential(size = m, scale = 1/Params["Mean"])), n))
     elif distribution == "normal":
         A = rankdata(-np.random.normal(size = m, loc = Params["Mean"], scale = Params["SD"]))
-        print(A)
         for i in range(0, n - 1):
-            A = np.vstack([A, rankdata(-np.random.normal(size = m, loc = Params["Mean"], scale = Params["SD"]))])
+            A = np.vstack([A, (-np.random.normal(size = m, loc = Params["Mean"], scale = Params["SD"])).ravel().argsort()])
         return A.astype(int)
     else:
         raise ValueError("Distribution name \"", distribution, "\" not recognized")#' Breaks full or partial orderings into pairwise comparisons

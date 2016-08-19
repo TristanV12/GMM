@@ -7,7 +7,6 @@ import pandas as pd
 
 def delta(Mu, SD=0, Var=False):
     Mu = Mu[0]
-    print("Mu", Mu)
     m=len(Mu)
     A=np.zeros((m,m), float)
 
@@ -79,15 +78,6 @@ def generateC(DataPairs, m, weighted = False, prior = 0, normalized = True):
     # C is the transition matrix, where C[i, j] denotes the number of times that
     C = np.zeros((m, m), int) - prior * m * diag
   
-    # pairsDF = pd.DataFrame(DataPairs)
-  
-    # if pairsDF.shape[1] > 2:
-    #     pairsDF.columns = ["i", "j", "d", "r"]
-    #     print(pairsDF)
-    # else:
-    #     pairsDF.columns = ["i", "j"]
-    #     C_wide = pairsDF.groupby("i", "j").summarize()
-  
     for i in DataPairs:
         C[i[0] - 1, i[1] - 1] += 1
 
@@ -122,7 +112,6 @@ def EstimationNormalGMM(DataPairs, m, itr=1000, Var=False, prior=0):
         for itr in range(1,itr + 1):
             alpha = 1/itr
             muhat = muhat + alpha *(np.exp((-delta(muhat)**2)/4)*(C - f(muhat))).sum(axis=1)
-            print(-delta(muhat))
             muhat = muhat - muhat.min()
   
     if Var:
@@ -139,4 +128,4 @@ def EstimationNormalGMM(DataPairs, m, itr=1000, Var=False, prior=0):
     for i in range(0,m):
         params.append(dict(Mean = muhat[0, i], SD = sdhat[0, i]))
     # print(dict(m = m, order = rankdata(-muhat[0,]), Mean = muhat[0,], SD = sdhat[0,], Time = t, Parameters = params))
-    return dict(m = m, order = rankdata(-muhat[0,]), Mean = muhat[0,], SD = sdhat[0,], Time = t, Parameters = params)
+    return dict(m = m, order = (-muhat[0,]).ravel().argsort(), Mean = muhat[0,], SD = sdhat[0,], Time = t, Parameters = params)
