@@ -7,6 +7,7 @@ def GenerateRUMParameters(m, distribution):
         arr.append(.1)
     if distribution=='normal':
         parameter = dict(m = m, Mean = np.random.uniform(0,1,(m,)), SD = np.array(arr))
+        parameter["order"] = parameter["Mean"].ravel().argsort()
     elif distribution=='exponential':
         unscaled = random.uniform(0,1,(m,))
         parameter = dict(m = m, Mean = unscaled/unscaled.sum())
