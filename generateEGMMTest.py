@@ -6,7 +6,7 @@ import os
 
 def generateTrial(trial, rankings):
 	filename = '/data/M6K2Trial' + str(trial) + '.csv'
-	os.makedirs(os.path.dirname(filename), exist_ok=True)
+	os.makedirs(os.path.dirname(filename))
 	file1 = open(filename, 'a')
 	parameters = GenerateRUMParameters(6, "normal")
 	arr = GenerateRUMData(parameters, 6, rankings, "normal")
