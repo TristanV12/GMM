@@ -6,7 +6,6 @@ import pytz
 import pandas as pd
 
 def delta(Mu, SD=0, Var=False):
-    Mu = Mu[0]
     m=len(Mu)
     A=np.zeros((m,m), float)
 
@@ -18,24 +17,20 @@ def delta(Mu, SD=0, Var=False):
         for i in range(0,m):
             for j in range(0,m):
                 A[i,j]=2**.5*(Mu[i]-Mu[j])/(SD[i]**2+SD[j]**2)**.5
-    # print(A)
     return A
 
-def f(Mu, SD=0, Var = False):
-    Mu = Mu[0]
+def f(Mu, SD=0, Var=False):
     m=len(Mu)
     A=np.zeros((m,m), float)
     if not Var:
         for i in range(0,m):
             for j in range(0,m):
                 A[i,j]=norm.cdf(Mu[i]-Mu[j],loc=0,scale=math.sqrt(2))
-        np.fill_diagonal(A, 1-np.sum(A, axis=0))
   
     if Var:
         for i in range(0,m):
             for j in range(0,m):
                 A[i,j]=norm.cdf(Mu[i]-Mu[j],0,scale=math.sqrt(SD[i]**2+SD[j]**2))
-        np.fill_diagonal(A, 1-np.sum(A, axis=0))
     np.fill_diagonal(A,0)
     return A
 
@@ -72,15 +67,15 @@ def normalizeC(C):
 #' data(Data.Test)
 #' Data.Test.pairs <- Breaking(Data.Test, "full")
 #' generateC(Data.Test.pairs, 5)
-def generateC(DataPairs, m, weighted = False, prior = 0, normalized = True):
-    diag = np.zeros((m, m), int)
+def generateC(DataPairs, m, ll, weighted = False, prior = 0, normalized = True):
+    diag = np.zeros((m, m), float)
     np.fill_diagonal(diag,1)
     # C is the transition matrix, where C[i, j] denotes the number of times that
-    C = np.zeros((m, m), int) - prior * m * diag
+    C = np.zeros((m, m), float) - prior * m * diag
   
     for i in DataPairs:
         C[i[0] - 1, i[1] - 1] += 1
-
+    print(C)
     if normalized:
         return normalizeC(C)
     else:
@@ -100,23 +95,30 @@ def generateC(DataPairs, m, weighted = False, prior = 0, normalized = True):
 #' data(Data.Test)
 #' Data.Test.pairs <- Breaking(Data.Test, "full")
 #' Estimation.Normal.GMM(Data.Test.pairs, 5)
-def EstimationNormalGMM(DataPairs, m, itr=1000, Var=False, prior=0):
+def EstimationNormalGMM(DataPairs, m, C=None, start=None, itr=3, ll=None, Var=False, prior=0, runstring=""):
     
     t0 = time.time() #get starting time
+
+    if runstring != "":
+        print("Now running", runstring)
   
     sdhat = np.ones((1,m), float)
-    muhat = np.ones((1,m), float)
-    C = generateC(DataPairs, m, prior)
+    if start != None:
+        muhat = start
+    else:
+        muhat = np.ones((1,m), float)
+    if C == None:
+        C = generateC(DataPairs, m, ll, prior)
 
     if not Var:
         for itr in range(1,itr + 1):
-            alpha = 1/itr
+            alpha = 1
             muhat = muhat + alpha *(np.exp((-delta(muhat)**2)/4)*(C - f(muhat))).sum(axis=1)
             muhat = muhat - muhat.min()
   
     if Var:
         for itr in range(1,itr + 1):
-            alpha = 1/itr
+            alpha = 1
             muhat = muhat + alpha *(exp(-delta(muhat,sdhat,Var=Var)^2/4)*(C - f(muhat,sdhat,Var=Var))).sum(axis=1)
             sdhat = abs(sdhat - alpha *rowSums(VarMatrix(sdhat)^(-2)*exp(-delta(muhat,sdhat,Var=Var)^2/4)*(C - f(muhat,sdhat,Var=TRUE))))
             muhat = muhat - muhat.min()
@@ -128,4 +130,6 @@ def EstimationNormalGMM(DataPairs, m, itr=1000, Var=False, prior=0):
     for i in range(0,m):
         params.append(dict(Mean = muhat[0, i], SD = sdhat[0, i]))
     # print(dict(m = m, order = rankdata(-muhat[0,]), Mean = muhat[0,], SD = sdhat[0,], Time = t, Parameters = params))
+    if runstring != "":
+        print(runstring, "completed.")
     return dict(m = m, order = (-muhat[0,]).ravel().argsort(), Mean = muhat[0,], SD = sdhat[0,], Time = t, Parameters = params)

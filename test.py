@@ -3,18 +3,32 @@ from EstimationNormalGMM import *
 from likelihood_rum import *
 
 if __name__ == '__main__':
-	Params = GenerateRUMParameters(4, "normal")
-	Data   = GenerateRUMData(Params,4,10,"normal")
-	# Params = dict(m = 4, Mean = np.array([0.26526090,0.04041244,0.22239384,0.34170505]), SD = np.array([0.30001765,0.48085526,0.06827066,0.64942853]))
-	# Data = np.array([[2,4,3,1],[4,1,3,2]])
-	# print(Data)
-	print("ground truth", Params)
-	print("\n\nGround truth order", Params["order"])
-	#print(likelihoodRUM(Data,Params, "norm"))
-	Data = Breaking(Data)
-	#print("\n\nData", Data)
-	final = EstimationNormalGMM(Data, 4)
-	print("Final order       ", final["order"])
-	print("\n\nGround truth mean", Params["Mean"])
-	print("Final mean       ", final["Mean"])
-	print("\n\nfinal",final)
+	#Params = dict(m = 4, Mean = np.array([0.5,0.1,0.8,0]), SD = np.array([1,1,1,1]))
+    mse = 0
+    itr = 20
+    n = 1000
+    m = 4
+    for iter in range(0, itr):
+        print("Trial: ",iter)
+        Params = GenerateRUMParameters(m, "normal")
+        Data   = GenerateRUMData(Params,m,n,"normal")
+		#print(Data)
+        mu=Params["Mean"]
+        mu=mu-mu.min()
+        print("Ground truth: ", mu)
+		#final = EstimationNormalGMM(mu, 4)
+		#print(final["Parameters"])
+        Data = Breaking(Data)
+		#print(Data)
+        final = EstimationNormalGMM(Data, m)
+        muhat = []
+        for i in range(0,m):
+            muhat.append(final["Parameters"][i]["Mean"])
+        print("Estimate: ", muhat)
+        se = 0
+        for i in range(0,m):
+            se += (mu[i]-muhat[i])**2
+        mse += se
+        print("MSE:", se)
+    mse = mse/itr
+    print(mse)
