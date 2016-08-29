@@ -5,7 +5,7 @@ import glob
 import os
 
 def generateTrial(trial, rankings):
-	filename = '/data/M6K2Trial' + str(trial) + '.csv'
+	filename = '/GMMData/M6K2Trial' + str(trial) + '.csv'
 	os.makedirs(os.path.dirname(filename))
 	file1 = open(filename, 'a')
 	parameters = GenerateRUMParameters(6, "normal")
