@@ -13,6 +13,25 @@ from EstimationNormalGMM import * # used for GMM
 from generate import *			  # used for breaking
 from GaussianRUMGMM import *	  # used for GMM
 
+def getNewAlphas(D):
+	arr = []
+	count = 0
+	for C in D:
+		arr.append(0)
+		for row in C:
+			for col in row:
+				if not math.isnan(col):
+					arr[count] += col
+		count += 1
+	total = 0
+	for a in arr:
+		total += a
+	for i in range(0, len(arr)):
+		arr[i] = arr[i] / total
+	return arr
+
+
+
 def normalizeD(D):
 	total = np.zeros((len(D[0]), len(D[0])), float)
 	for i in range(0,len(D)):
@@ -92,7 +111,7 @@ def getTheta(m, k):
 	Output:
 
 '''
-def EGMM(data, datapairs, m, k=2, itr=2):
+def EGMM(data, datapairs, m, k=2, itr=20):
 	#get start time
 	t0 = time.time()
 
@@ -110,12 +129,13 @@ def EGMM(data, datapairs, m, k=2, itr=2):
 			ll = []
 
 		D = generateC(datapairs, alpha, likelihoods, m, k)
-		print(D)
 
 		for x in range(0, len(thetas)):
 			output = GMMGaussianRUM(data, D[x], m, len(likelihoods[0]))
 			thetas[x] = dict(Mean=output[0], SD=np.array([1] * m))
-		print(thetas)
+		print("\nthetas", thetas)
+		alpha = getNewAlphas(D)
+		print("alpha", alpha)
 	tf = time.time()
 	print("Total runtime: ", tf - t0)
 
