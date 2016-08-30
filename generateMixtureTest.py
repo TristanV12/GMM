@@ -23,14 +23,16 @@ if __name__ == '__main__':
 	# 	generateTrial(t, rankings)
 	files = glob.glob("*.csv")
 	count = 0
+	print(len(files))
 	while count < len(files):
+		print(count)
 		alpha = random.random()
 		f1 = open(files[count])
-		if count + 1 != rankings:
+		if count + 1 != len(files):
 			f2 = open(files[count + 1])
 		else:
 			f2 = open(files[0])
-		file1 = open('M6K2Trial' + str(int(count / 2)) + 'Mixture.csv', 'a')
+		file1 = open('M6K2Trial' + str(int(count)) + 'Mixture.csv', 'a')
 		writer = csv.writer(file1, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 		reader1 = csv.reader(f1)
 		reader2 = csv.reader(f2)
