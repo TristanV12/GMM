@@ -31,6 +31,8 @@ if __name__ == '__main__':
 		writer.writerow([alpha])
 		counter = 0
 		for itr in range(0, 10000):
+			print(counter)
+			counter += 1
 			a = random.random()
 			if a < alpha:
 				next(reader1)
