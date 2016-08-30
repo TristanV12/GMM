@@ -10,7 +10,7 @@ if __name__ == '__main__':
 	rankings = 10000
 
 	files = glob.glob("*.csv")
-	count = 0
+	count = 1
 	print(len(files))
 	while count < len(files):
 		print(count)
