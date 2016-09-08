@@ -4,12 +4,26 @@ import math
 import numpy as np
 import pytz
 import pandas as pd
-from numpy.linalg import inv, det, pinv
+from numpy.linalg import inv, pinv
 
 #probability of one alternative is preferred to another.
 #x is the difference between the means of the two alternatives
 def prPair(x):
     return norm.cdf(x, 0, scale=math.sqrt(2))
+
+def GauRUMobj(x, breaking):
+    #breaking = args
+    #print("x:", x)
+    #print("Breaking: ", breaking)
+    m = len(breaking) # number of alternatives
+    #print("m: ", m)
+    se = 0 # objective function
+    for i1 in range(0, m):
+        for i2 in range(i1+1, m):
+            #print(x[i1], x[i2], breaking[i1][i2], breaking[i2][i1])
+            se += (breaking[i1][i2] * prPair(x[i2]-x[i1]) - breaking[i2][i1] * prPair(x[i1] - x[i2])) ** 2
+            #print("SE: ", se)
+    return se
 
 #derivative of probability
 def dPrPair(x):
@@ -20,17 +34,24 @@ def ddPrPair(x):
     return -x * np.exp(- x ** 2/4)/(4 * math.sqrt(math.pi))
 
 #calculate the breakings
-def dataBreaking(data, m, normalize):
-    breaking = np.zeros((m, m), int)
+def dataBreaking(data, m, k, weights):
+    breaking = np.zeros((k, m, m), float)
     n = len(data)
-    for d in data:
-        for i in range(0, m):
-            for j in range(i+1, m):
-                breaking[d[i], d[j]] += 1
-    if normalize:
-        return breaking/n
-    else:
-        return breaking
+    for r in range(0, k):
+        for j in range(0, n):
+            for i1 in range(0, m):
+                for i2 in range(i1+1, m):
+                    breaking[r][data[j, i1]][data[j, i2]] += weights[r, j]
+    return breaking
+
+def freqBreaking(weights, m, k):
+    breaking = np.zeros((k, m, m), float)
+    for r in range(0, k):
+        for vote, freq in weights[r].items():
+            for i1 in range(0, m):
+                for i2 in range(i1+1, m):
+                    breaking[r][int(vote[i1]), int(vote[i2])] += freq
+    return breaking
 
 #for debugging purpose
 def trueBreaking(Mu):
@@ -45,29 +66,32 @@ def trueBreaking(Mu):
     return A
 
 #To calculate the gradient of objective function
-def gradientPrPair(breaking, theta, n):
-    theta = theta[0]
-    m = len(theta)
-    grad = np.zeros((m, 1), float)
+def gradientPrPair(theta, breaking):
+    #theta = theta[0]
+    m = len(breaking)
+    n = breaking[0][1] + breaking[1][0]
+    grad = np.zeros((1, m), float)
+    grad = grad[0]
     for i in range(0, m):
         for j in range(0, m):
             if j != i:
                 x = theta[i] - theta[j]
-                grad[i] += 2 * (breaking[i][j] - n * prPair(x)) * dPrPair(x)
+                grad[i] += 2 * n * (breaking[i][j] - n * prPair(x)) * dPrPair(x)
     return grad
 
 #To calculate the Hessian matrix
-def hessianPrPair(breaking, theta, n):
-    theta = theta[0]
-    m = len(theta)
+def hessianPrPair(theta, breaking):
+    #theta = theta[0]
+    m = len(breaking)
+    n = breaking[0][1] + breaking[1][0]
     hessian = np.zeros((m, m), float)
     for i in range(0, m):
         for j in range(0, m):
             if j != i:
                 x = theta[i] - theta[j]
-                hessian[i][i] += 2*(breaking[i][j]-n*prPair(x))*ddPrPair(x) - 2*n*(dPrPair(x))**2
+                hessian[i][i] += 2*n*(breaking[i][j]-n*prPair(x))*ddPrPair(x) - 2*n*n*(dPrPair(x))**2
                 if j > i:
-                    hessian[i][j] = 2*n*dPrPair(x)**2-2*ddPrPair(breaking[i][j]-n*prPair(x))
+                    hessian[i][j] = 2*n*n*dPrPair(x)**2-2*n*ddPrPair(breaking[i][j]-n*prPair(x))
                 else:
                     hessian[i][j] = hessian[j][i]
     return hessian
@@ -85,20 +109,38 @@ def hessianPrPair(breaking, theta, n):
 #' data(Data.Test)
 #' Data.Test.pairs <- Breaking(Data.Test, "full")
 #' Estimation.Normal.GMM(Data.Test.pairs, 5)
-def GMMGaussianRUM(data, breaking, m, n, itr=1):
+def GMMGaussianRUM(init, breaking, m, itr=1000):
 
     t0 = time.time() #get starting time
 
     muhat = np.ones((1, m), float)
-    #breaking = dataBreaking(data, m, False)
+    #muhat[0] = init
+    Grad = np.empty((1, m), float)
+    print("GMM Itr:  ", end='')
 
-    for itr in range(1,itr + 1):
-        Hinv = np.linalg.pinv(hessianPrPair(breaking, muhat, n))
-        Grad = gradientPrPair(breaking, muhat, n)
-        muhat = (muhat.transpose() - np.dot(Hinv, Grad)).transpose()
-        muhat = muhat - muhat.min()
-
+    for it in range(1,itr + 1):
+        print("\b"*len(str(it-1)) + str(it), end='')
+        noise = 0
+        try:
+            Hinv = np.linalg.inv(hessianPrPair(muhat[0], breaking))
+        except np.linalg.linalg.LinAlgError:
+            noise = np.random.uniform(-0.05, 0.05, (m,))
+            print("Singular Hessian! Fixed steps will be used.")
+            Hinv = 0.00 * np.identity(m)
+        #print(Hinv)
+        Grad[0] = gradientPrPair(muhat[0], breaking)
+        muhatp = (muhat.transpose() - np.dot(Hinv, Grad.transpose())).transpose() + noise
+        #muhat -= 0.01 * Grad
+        diff = (np.sum(muhat) - np.sum(muhatp))/m
+        muhatp += diff
+        se = np.sum((muhat - muhatp) ** 2)
+        if se <= 1e-6:
+            break
+        else:
+            muhat = muhatp
+        #muhat = muhat - np.log(np.sum(np.exp(muhat)))
+    print()
     t = time.time() - t0
-    print("Time used:", t)
+    #print("Time used:", t)
 
-    return muhat
+    return muhatp

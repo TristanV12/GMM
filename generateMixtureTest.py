@@ -6,10 +6,10 @@ import os
 import random
 
 if __name__ == '__main__':
-	trials = 1000
-	rankings = 10000
+	trials = 500
+	rankings = 5000
 
-	files = glob.glob("*.csv")
+	files = glob.glob("data1to10\\*.csv")
 	count = 1
 	print(len(files))
 	while count < len(files):
@@ -20,7 +20,7 @@ if __name__ == '__main__':
 			f2 = open(files[count + 1])
 		else:
 			f2 = open(files[0])
-		file1 = open('M6K2Trial' + str(int(count)) + 'Mixture.csv', 'a')
+		file1 = open('mixtureData1to10\\M6K2GT1to10Trial' + str(int(count)) + 'Mixture.csv', 'a')
 		writer = csv.writer(file1, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 		reader1 = csv.reader(f1)
 		reader2 = csv.reader(f2)
@@ -30,8 +30,7 @@ if __name__ == '__main__':
 		writer.writerow(mean2)
 		writer.writerow([alpha])
 		counter = 0
-		for itr in range(0, 5000):
-			print(counter)
+		for itr in range(0, rankings):
 			counter += 1
 			a = random.random()
 			if a < alpha:
