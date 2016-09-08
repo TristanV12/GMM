@@ -6,37 +6,34 @@ import os
 import random
 
 if __name__ == '__main__':
-	trials = 500
-	rankings = 5000
+	trials = 1000
+	rankings = 10000
+	p2 = GenerateRUMParameters(6, "normal")
 
-	files = glob.glob("data1to10\\*.csv")
-	count = 1
-	print(len(files))
-	while count < len(files):
+	for count in range(0, trials):
 		print(count)
 		alpha = random.random()
-		f1 = open(files[count])
-		if count + 1 != len(files):
-			f2 = open(files[count + 1])
-		else:
-			f2 = open(files[0])
-		file1 = open('mixtureData1to10\\M6K2GT1to10Trial' + str(int(count)) + 'Mixture.csv', 'a')
+		file1 = open('M6R10000Trial' + str(int(count)) + 'Mixture.csv', 'a')
 		writer = csv.writer(file1, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-		reader1 = csv.reader(f1)
-		reader2 = csv.reader(f2)
-		mean1 = next(reader1)[0].split(' ')
-		mean2 = next(reader2)[0].split(' ')
+		p1 = p2
+		p2 = GenerateRUMParameters(6, "normal")
+		mean1 = p1["Mean"]
+		mean2 = p2["Mean"]
 		writer.writerow(mean1)
 		writer.writerow(mean2)
 		writer.writerow([alpha])
-		counter = 0
+
+		mean1Rankings = GenerateRUMData(p1, 6, rankings, "normal")
+		mean2Rankings = GenerateRUMData(p2, 6, rankings, "normal")
+		itr1 = 0
+		itr2 = 0
+
 		for itr in range(0, rankings):
-			counter += 1
 			a = random.random()
 			if a < alpha:
-				next(reader1)
-				writer.writerow(next(reader1)[0].split(' '))
+				writer.writerow(mean1Rankings[itr1])
+				itr1 += 1
 			else:
-				next(reader2)
-				writer.writerow(next(reader2)[0].split(' '))
-		count += 1 
+				writer.writerow(mean2Rankings[itr2])
+				itr2 += 1
+		file1.close()
