@@ -1,12 +1,12 @@
 import numpy as np
 from scipy.stats import rankdata
 
-def GenerateRUMParameters(m, distribution):
+def GenerateRUMParameters(m, distribution, low=0, high=1):
     arr = []
     for i in range(0, m):
         arr.append(1)
     if distribution=='normal':
-        parameter = dict(m = m, Mean = np.random.uniform(0,1,(m,)), SD = np.array(arr))
+        parameter = dict(m = m, Mean = np.random.uniform(low,high,(m,)), SD = np.array(arr))
         parameter["order"] = parameter["Mean"].ravel().argsort()
     elif distribution=='exponential':
         unscaled = random.uniform(0,1,(m,))
