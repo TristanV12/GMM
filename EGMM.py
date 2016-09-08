@@ -161,7 +161,7 @@ def EGMM(alphastar, GT1, GT2, data, m, k=2, itr=5):
 	#initialize variables
 	alphas = np.array([[np.random.rand()], [np.random.rand()]])
 	alphas = alphas/np.sum(alphas)
-	#print("InitAlphas: ", alphas)
+	print("InitAlphas: ", alphas)
 	n = len(data)
 	thetas = getTheta(m, k) # RUMs
 	#print("THETAS: ", thetas)
@@ -194,7 +194,7 @@ def EGMM(alphastar, GT1, GT2, data, m, k=2, itr=5):
 		likelihoods = []
 		se1 = np.sum((GT1-thetas[0]["Mean"]) ** 2) + np.sum((GT2-thetas[1]["Mean"]) ** 2) + (alphastar - alphas[0]) ** 2
 		se2 = np.sum((GT1-thetas[1]["Mean"]) ** 2) + np.sum((GT2-thetas[0]["Mean"]) ** 2) + (alphastar - alphas[1]) ** 2
-		#print("ERROR: ", min(se1, se2))
+		print("ERROR: ", min(se1, se2))
 	tf = time.time()
 
 	return alphas, thetas
@@ -210,13 +210,13 @@ def E_GMM(alphastar, GT1, GT2, data, m, k = 2, itr = 20, n0 = 10000, ns = 2000):
 	#initialize variables
 	alphas = np.zeros((k, 1), float)
 	alphasp = np.zeros((k, 1), float)
-	bnds = ((0, 10),(0, 10),(0, 10),(0, 10), (0, 10), (0, 10))
+	finalItr = itr
 	#Random initialization of alphas.
 	for r in range(0, k):
 		#alphas[r][0] = 1/k
 		alphas[r] = np.random.rand()
 	alphas = alphas/np.sum(alphas)
-	print("InitAlphas: ", alphas)
+	# print("InitAlphas: ", alphas)
 
 	n = len(data)
 	DataDict = Dictionarize(data)#A dictionay of dataset
@@ -228,13 +228,14 @@ def E_GMM(alphastar, GT1, GT2, data, m, k = 2, itr = 20, n0 = 10000, ns = 2000):
 	#print("Weights: ", weights)
 	thetas = getTheta(m, k) # RUMs
 	#print("Thetas: ", thetas)
-	#print(thetas)
 	freqdicts = [] # To store samples from each component
 	breaking = np.zeros((k, m, m), float) # Breakings for each component
 	output = np.zeros((k, m), float) # Estimated means for each component
 
 	for i in range(0, itr):
 		print("EM Itr: ", i)
+		ini = np.random.uniform(0,5,(k,m))
+		#print(ini)
 		n1 = np.zeros((1, k), float)[0]
 		#print("E Step: ")
 		for r in range(0, k):
@@ -244,8 +245,6 @@ def E_GMM(alphastar, GT1, GT2, data, m, k = 2, itr = 20, n0 = 10000, ns = 2000):
 			for key, value in tempdict.items():
 				tempdict[key] /= n0
 			freqdicts.append(tempdict)
-		#print("Dictionaries: ", freqdicts)
-		#print("FreqDicts: ", freqdicts)
 		ss = 0
 		for vote, freq in DataDict.items():
 			for r in range(0, k):
@@ -255,8 +254,6 @@ def E_GMM(alphastar, GT1, GT2, data, m, k = 2, itr = 20, n0 = 10000, ns = 2000):
 					ss += weights[r][vote]
 				else:
 					weights[r][vote] = 0 #ignore this vote if it is not in the samples
-				#print("Weights[r]: ", weights[r])
-				#print("DataDict: ", DataDict)
 			if ss != 0:
 				#print(ss)
 				for r in range(0, k):
@@ -281,7 +278,7 @@ def E_GMM(alphastar, GT1, GT2, data, m, k = 2, itr = 20, n0 = 10000, ns = 2000):
 			breaking[r] = breaking[r] * ns / n1[r]
 			#output[r] = GMMGaussianRUM(output[r], breaking[r], m, n1[r])
 			#output[r] = GMMGaussianRUM(output[r], breaking[r], m)
-			rslt = minimize(GauRUMobj, x0=thetas[r]["Mean"], args=(breaking[r]), bounds = ((0, 10),(0, 10),(0, 10),(0, 10), (0, 10), (0, 10)))
+			rslt = minimize(GauRUMobj, x0=ini[r], args=(breaking[r]), bounds = ((0, 5),(0, 5),(0, 5),(0, 5), (0, 5), (0, 5)))
 			output[r] = rslt.x
 			#print("Output", r, output[r])
 			output[r] -= output.min()#np.log(np.sum(np.exp(output[r])))
@@ -293,19 +290,17 @@ def E_GMM(alphastar, GT1, GT2, data, m, k = 2, itr = 20, n0 = 10000, ns = 2000):
 		# print("Weighted ERROR: ", wse)
 
 		se1, cp10, cp11 = se2Mix(alphas[0][0], thetas[0]["Mean"], thetas[1]["Mean"], alphasp[0][0], output[0], output[1], optimize = True, weighted = False)
-		#print("SE1: ", se1)
+		# print("SE1: ", se1)
 		#print(alphas[0, 0], alphasp[0, 0], thetas[0]["Mean"], thetas[1]["Mean"], output)
 		alphas = alphasp
 		for r in range(0, k):
 			thetas[r] = dict(Mean=output[r].copy(), SD=np.array([1] * m))
 		#print("EstMeans: for ", r, "is", output[r])
 
-		if se1 <= 1e-3 and i >= 10:
+		if se1 <= 1e-3 and i >= 5:
+			finalItr = i
 			break
-
-		#print("PL-Normalized ERROR: ", se2Mix(alphastar, GT1, GT2, alphas[0][0], output[0], output[1], normalize = True))
-		#print("Posi-normalized ERROR: ", se2Mix(alphastar, GT1, GT2, alphas[0][0], output[0], output[1], normalize = False))
 
 	tf = time.time()
 
-	return alphas, thetas, cp0, cp1, tf - t0, se, wse, se1
+	return alphas, thetas, cp0, cp1, tf - t0, se, wse, se1, finalItr
