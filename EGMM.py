@@ -161,7 +161,7 @@ def EGMM(alphastar, GT1, GT2, data, m, k=2, itr=5):
 	#initialize variables
 	alphas = np.array([[np.random.rand()], [np.random.rand()]])
 	alphas = alphas/np.sum(alphas)
-	print("InitAlphas: ", alphas)
+	#print("InitAlphas: ", alphas)
 	n = len(data)
 	thetas = getTheta(m, k) # RUMs
 	#print("THETAS: ", thetas)
@@ -194,7 +194,7 @@ def EGMM(alphastar, GT1, GT2, data, m, k=2, itr=5):
 		likelihoods = []
 		se1 = np.sum((GT1-thetas[0]["Mean"]) ** 2) + np.sum((GT2-thetas[1]["Mean"]) ** 2) + (alphastar - alphas[0]) ** 2
 		se2 = np.sum((GT1-thetas[1]["Mean"]) ** 2) + np.sum((GT2-thetas[0]["Mean"]) ** 2) + (alphastar - alphas[1]) ** 2
-		print("ERROR: ", min(se1, se2))
+		#print("ERROR: ", min(se1, se2))
 	tf = time.time()
 
 	return alphas, thetas
@@ -289,11 +289,11 @@ def E_GMM(alphastar, GT1, GT2, data, m, k = 2, itr = 20, n0 = 10000, ns = 2000):
 		freqdicts = []
 		se, cp0, cp1 = se2Mix(alphastar, GT1, GT2, alphas[0][0], output[0], output[1], optimize = True, weighted = False)
 		wse, cp0, cp1 = se2Mix(alphastar, GT1, GT2, alphas[0][0], output[0], output[1], optimize = True, weighted = True)
-		print("Optimal ERROR: ", se)
-		print("Weighted ERROR: ", wse)
+		# print("Optimal ERROR: ", se)
+		# print("Weighted ERROR: ", wse)
 
 		se1, cp10, cp11 = se2Mix(alphas[0][0], thetas[0]["Mean"], thetas[1]["Mean"], alphasp[0][0], output[0], output[1], optimize = True, weighted = False)
-		print("SE1: ", se1)
+		#print("SE1: ", se1)
 		#print(alphas[0, 0], alphasp[0, 0], thetas[0]["Mean"], thetas[1]["Mean"], output)
 		alphas = alphasp
 		for r in range(0, k):
@@ -308,4 +308,4 @@ def E_GMM(alphastar, GT1, GT2, data, m, k = 2, itr = 20, n0 = 10000, ns = 2000):
 
 	tf = time.time()
 
-	return alphas, thetas, cp0, cp1
+	return alphas, thetas, cp0, cp1, tf - t0, se, wse, se1
