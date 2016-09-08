@@ -24,16 +24,13 @@ if __name__ == '__main__':
 		f1 = open(file1, "r")
 		reader = csv.reader(f1)
 		GT1 = dict(m = m, Mean = list(map(float,next(reader)[0].split(' '))), SD = SD)
-		next(reader)
 		GT2 = dict(m = m, Mean = list(map(float,next(reader)[0].split(' '))), SD = SD)
-		next(reader)
 		alpha = float(next(reader)[0])
 		GroundTruth1 = GT1["Mean"]
 		GroundTruth2 = GT2["Mean"]
 
 		Data = []
 		for itr in range(0, n):
-			next(reader)
 			Data.append(list(map(int,next(reader)[0].split(' '))))
 
 		r = 0
