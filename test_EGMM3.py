@@ -17,7 +17,7 @@ if __name__ == '__main__':
 	files = glob.glob("*Mixture.csv")
 
 	trial = 0
-	for file1 in files:
+	for file1 in files[100:]:
 		trial += 1
 		print("Running trial", trial)
 		print(file1)
