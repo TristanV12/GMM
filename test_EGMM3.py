@@ -17,7 +17,7 @@ if __name__ == '__main__':
 	files = glob.glob("*Mixture.csv")
 
 	trial = 0
-	for file1 in files[100:]:
+	for file1 in files[200:]:
 		trial += 1
 		print("Running trial", trial)
 		print(file1)
@@ -52,5 +52,3 @@ if __name__ == '__main__':
 			writer.writerow(["Runtime", runtime])
 			output.close()
 		f1.close()
-		if trial >= 100:
-			break
