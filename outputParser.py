@@ -54,8 +54,8 @@ if __name__ == '__main__':
 	array = [[], [], [], [], []]
 	alphas = []
 	countArray = [0, 0, 0, 0, 0]
-	x = [200, 400, 600, 800, 1000]
-	files = glob.glob("output\\*.csv") + glob.glob("output2\\*.csv") + glob.glob("output3\\*.csv")
+	x = [1200, 1400, 1600, 1800, 2000]
+	files = glob.glob("output4\\*.csv")# + glob.glob("output2\\*.csv") + glob.glob("output3\\*.csv")
 
 	trial = 0
 	#print(len(files))
@@ -64,7 +64,7 @@ if __name__ == '__main__':
 		#print("Running trial", trial)
 		f1 = open(file1, "r")
 		reader = csv.reader(f1)
-		ranks = int(int(next(reader)[0].split(' ')[0]) / 200) - 1
+		ranks = int((int(next(reader)[0].split(' ')[0]) - 1000) / 200) - 1
 		gt1 = next(reader)
 		for g in range(0, len(gt1)):
 			gt1[g] = float(gt1[g].replace("|[", "").replace("]|", "").replace(" ", "").replace("GT1", ""))
