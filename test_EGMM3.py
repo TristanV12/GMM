@@ -17,7 +17,7 @@ if __name__ == '__main__':
 	files = glob.glob("*Mixture.csv")
 
 	trial = 0
-	for file1 in files[200:]:
+	for file1 in files:
 		trial += 1
 		print("Running trial", trial)
 		print(file1)
@@ -33,8 +33,8 @@ if __name__ == '__main__':
 		for iterator in range(0, n):
 			Data.append(list(map(int,next(reader)[0].split(' '))))
 
-		r = 0
-		while r < 1000:
+		r = 1000
+		while r < 2000:
 			r += 200
 			output = open("outputTrial" + str(trial) + "rankings_" + str(r) + ".csv", 'a')
 			writer = csv.writer(output, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -52,3 +52,5 @@ if __name__ == '__main__':
 			writer.writerow(["Runtime", runtime])
 			output.close()
 		f1.close()
+		if trial > 500:
+			break
