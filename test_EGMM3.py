@@ -16,8 +16,8 @@ if __name__ == '__main__':
 	SD = np.array([1]*m)
 	files = glob.glob("*Mixture.csv")
 
-	trial = 0
-	for file1 in files[500:]:
+	trial = 100
+	for file1 in files[600:]:
 		trial += 1
 		print("Running trial", trial)
 		print(file1)
