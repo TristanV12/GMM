@@ -34,7 +34,7 @@ if __name__ == '__main__':
             Data.append(dataset2[cnt2])
             cnt2 += 1
     DataDict = Dictionarize(Data)
-    Breaking = dataBreaking(DataDict, m)
+    Breaking = dataBreaking(DataDict, m, 2)
     x = np.append(GroundTruth1, GroundTruth2)
     x = np.insert(x, 0, alpha)
     #print(x)
