@@ -47,15 +47,15 @@ if __name__ == '__main__':
 	k = 2
 	itr = 20
 	SD = np.array([1]*m)
-	ave_OMSE = [0]*5
-	ave_WMSE = [0]*5
-	ave_SE1 = [0]*5
-	ave_time = [0]*5
-	array = [[], [], [], [], []]
+	ave_OMSE = [0]*10
+	ave_WMSE = [0]*10
+	ave_SE1 = [0]*10
+	ave_time = [0]*10
+	array = [[], [], [], [], [], [], [], [], [], []]
 	alphas = []
-	countArray = [0, 0, 0, 0, 0]
-	x = [1200, 1400, 1600, 1800, 2000]
-	files = glob.glob("output4\\*.csv")# + glob.glob("output2\\*.csv") + glob.glob("output3\\*.csv")
+	countArray = [0] * 10
+	x = [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]
+	files = glob.glob("output4\\*.csv") + glob.glob("output2\\*.csv") + glob.glob("output3\\*.csv") + glob.glob("output\\*.csv") + glob.glob("output5\\*.csv") + glob.glob("output6\\*.csv")
 
 	trial = 0
 	#print(len(files))
@@ -64,7 +64,7 @@ if __name__ == '__main__':
 		#print("Running trial", trial)
 		f1 = open(file1, "r")
 		reader = csv.reader(f1)
-		ranks = int((int(next(reader)[0].split(' ')[0]) - 1000) / 200) - 1
+		ranks = int((int(next(reader)[0].split(' ')[0])) / 200) - 1
 		gt1 = next(reader)
 		for g in range(0, len(gt1)):
 			gt1[g] = float(gt1[g].replace("|[", "").replace("]|", "").replace(" ", "").replace("GT1", ""))
@@ -87,8 +87,6 @@ if __name__ == '__main__':
 			temp = cp1 + cp2
 			cp1 = temp[:6]
 			cp2 = temp[6:]
-			print(cp1)
-			print(cp2)
 			cp = next(reader)[0]
 			cp = cp.replace("|[", "").replace("]|", "").replace("CP2", "").split(' ')
 			for c in cp:
@@ -201,7 +199,7 @@ if __name__ == '__main__':
 	# plt.ylabel("Frequency")
 	# plt.xlabel("Alpha where MSE > 2 n=1000")
 	# plt.show()
-	for q in range(0,5):
+	for q in range(0,10):
 		ave_OMSE[q] = ave_OMSE[q] / countArray[q]
 		ave_WMSE[q] = ave_WMSE[q] / countArray[q]
 		ave_time[q] = ave_time[q] / countArray[q]

@@ -12,12 +12,12 @@ if __name__ == '__main__':
 	m = 6
 	n = 10000
 	k = 2
-	itr = 20
+	itr = 10
 	SD = np.array([1]*m)
 	files = glob.glob("*Mixture.csv")
 
 	trial = 0
-	for file1 in files[600:]:
+	for file1 in files:
 		trial += 1
 		print("Running trial", trial)
 		print(file1)
@@ -52,5 +52,5 @@ if __name__ == '__main__':
 			writer.writerow(["Runtime", runtime])
 			output.close()
 		f1.close()
-		# if trial >= 100:
-		# 	break
+		if trial >= 100:
+			break
