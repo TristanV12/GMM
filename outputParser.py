@@ -55,7 +55,7 @@ if __name__ == '__main__':
 	alphas = []
 	countArray = [0] * 10
 	x = [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]
-	files = glob.glob("output4\\*.csv") + glob.glob("output2\\*.csv") + glob.glob("output3\\*.csv") + glob.glob("output\\*.csv") + glob.glob("output5\\*.csv") + glob.glob("output6\\*.csv")
+	files = glob.glob("output\\*.csv")# + glob.glob("output2\\*.csv") + glob.glob("output3\\*.csv") + glob.glob("output\\*.csv") + glob.glob("output5\\*.csv") + glob.glob("output6\\*.csv")
 
 	trial = 0
 	#print(len(files))

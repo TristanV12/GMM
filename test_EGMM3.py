@@ -12,7 +12,7 @@ if __name__ == '__main__':
 	m = 6
 	n = 10000
 	k = 2
-	itr = 10
+	itr = 20
 	SD = np.array([1]*m)
 	files = glob.glob("*Mixture.csv")
 
@@ -30,7 +30,7 @@ if __name__ == '__main__':
 		GroundTruth2 = GT2["Mean"]
 
 		Data = []
-		for iterator in range(0, n):
+		for iterator in range(2000, n):
 			Data.append(list(map(int,next(reader)[0].split(' '))))
 
 		r = 0
@@ -52,5 +52,5 @@ if __name__ == '__main__':
 			writer.writerow(["Runtime", runtime])
 			output.close()
 		f1.close()
-		if trial >= 100:
-			break
+		# if trial >= 100:
+		# 	break
