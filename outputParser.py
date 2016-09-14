@@ -55,13 +55,13 @@ if __name__ == '__main__':
 	alphas = []
 	countArray = [0] * 10
 	x = [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]
-	files = glob.glob("output\\*.csv")# + glob.glob("output2\\*.csv") + glob.glob("output3\\*.csv") + glob.glob("output\\*.csv") + glob.glob("output5\\*.csv") + glob.glob("output6\\*.csv")
+	files = glob.glob("output20Itr\\output\\*.csv") + glob.glob("output20Itr\\output2\\*.csv") + glob.glob("output20Itr\\output3\\*.csv") + glob.glob("output20Itr\\output4\\*.csv") + glob.glob("output20Itr\\output5\\*.csv") + glob.glob("output20Itr\\output6\\*.csv") + glob.glob("output20Itr\\output7\\*.csv")
 
 	trial = 0
 	#print(len(files))
 	for file1 in files:
 		trial += 1
-		#print("Running trial", trial)
+		print("Running trial", trial)
 		f1 = open(file1, "r")
 		reader = csv.reader(f1)
 		ranks = int((int(next(reader)[0].split(' ')[0])) / 200) - 1
@@ -118,7 +118,7 @@ if __name__ == '__main__':
 		time = float(next(reader)[0].split(' ')[1])
 
 
-		if alpha > 0 and alpha < 1:
+		if alpha > .1 and alpha < .9:
 			ave_OMSE[ranks] += omse
 			ave_WMSE[ranks] += se2Mix(alpha, np.array(gt1), np.array(gt2), hatalpha, np.array(cp1), np.array(cp2), optimize=True, weighted=True)
 			ave_SE1[ranks] += se1

@@ -13,7 +13,7 @@ if __name__ == '__main__':
 	for count in range(0, trials):
 		print(count)
 		alpha = random.random()
-		file1 = open('Mean0to5M6R10000Trial' + str(int(count)) + 'Mixture.csv', 'a')
+		file1 = open('Mean0to5M6R10000Trial' + str(int(count) + 1000) + 'Mixture.csv', 'a')
 		writer = csv.writer(file1, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 		p1 = p2
 		p2 = GenerateRUMParameters(6, "normal", high=5)

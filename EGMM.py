@@ -297,9 +297,9 @@ def E_GMM(alphastar, GT1, GT2, data, m, k = 2, itr = 20, n0 = 10000, ns = 2000):
 			thetas[r] = dict(Mean=output[r].copy(), SD=np.array([1] * m))
 		#print("EstMeans: for ", r, "is", output[r])
 
-		# if se1 <= 1e-3 and i >= 5:
-		# 	finalItr = i
-		# 	break
+		if se1 <= 1e-3 and i >= 5:
+			finalItr = i
+			break
 
 	tf = time.time()
 
