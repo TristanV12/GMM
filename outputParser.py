@@ -102,13 +102,13 @@ if __name__ == '__main__':
 		[0]*num_datapoints]
 	countArray = [0] * 10
 	x = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-	files = (glob.glob("output20Itr\\output\\*.csv") + glob.glob("output20Itr\\output2\\*.csv")
-		+ glob.glob("output20Itr\\output3\\*.csv") + glob.glob("output20Itr\\output4\\*.csv")
-		+ glob.glob("output20Itr\\output5\\*.csv") + glob.glob("output20Itr\\output6\\*.csv")
-		+ glob.glob("output20Itr\\output7\\*.csv"))
+	files = (glob.glob("output20ItrFixed\\output3\\*.csv") + glob.glob("output20ItrFixed\\output9-25-2016\\*.csv") + glob.glob("output20ItrFixed\\output20Itr_1\\*.csv"))
+		# + glob.glob("output20Itr\\output3\\*.csv") + glob.glob("output20Itr\\output4\\*.csv")
+		# + glob.glob("output20Itr\\output5\\*.csv") + glob.glob("output20Itr\\output6\\*.csv")
+		# + glob.glob("output20Itr\\output7\\*.csv"))
 
 	trial = 0
-	#print(len(files))
+	print(len(files))
 	for file1 in files:
 		trial += 1
 		if trial % 1000 == 0:
