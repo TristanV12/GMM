@@ -61,7 +61,7 @@ if __name__ == '__main__':
         #     for itr in range(0, mm_iters):
         #         rslt_mse_mm[itr, j] = stats.mse(gamma, gamma_mmfull[itr])
         data = np.array(data)
-        result = Estimation_PL_MLE(data, 2)
+        result = Estimation_PL_MLE(data, mm_iters)
 
         print()
         outname = "output_PL_MLE_10Alternatives"+str(trialcnt)+".csv"
