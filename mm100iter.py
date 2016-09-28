@@ -22,7 +22,6 @@ if __name__ == '__main__':
     rslt_ot_mm = np.zeros((maxdatasize, 10), float)
     for f in glob.glob("data*.csv"):
         trialcnt += 1
-        print("Trial: ", trialcnt)
         filename = open(f)
         reader = csv.reader(filename)
         next(reader)
@@ -60,14 +59,18 @@ if __name__ == '__main__':
         #     rslt_ot_mm[trialcnt-1,j] = otime
         #     for itr in range(0, mm_iters):
         #         rslt_mse_mm[itr, j] = stats.mse(gamma, gamma_mmfull[itr])
-        data = np.array(data)
-        result = Estimation_PL_MLE(data, mm_iters)
+        for r in range(1, 11):
+            data_sample = np.array(data[0:r * 100])
+            result = Estimation_PL_MLE(data_sample, mm_iters)
 
-        print()
-        outname = "output_PL_MLE_10Alternatives"+str(trialcnt)+".csv"
-        out = open(outname, "w")
-        writer = csv.writer(out)
-        for key, value in result.items():
-            writer.writerow([key, value])
-        out.close()
+            print("Trial:", trialcnt, "|", r*100, "rankings")
+            outname = "output_PL_MLE_10Alternatives_"+str(r*100)+"rankings_"+str(trialcnt)+".csv"
+            out = open(outname, "w")
+            writer = csv.writer(out)
+            writer.writerow(["rankings", r*100])
+            writer.writerow(["GT", [ float(x) for x in gt ]])
+            for key, value in result.items():
+                writer.writerow([key, value])
+            out.close()
+        filename.close()
         #break
