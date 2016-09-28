@@ -64,7 +64,7 @@ if __name__ == '__main__':
         result = Estimation_PL_MLE(data, 2)
 
         print()
-        outname = "output"+str(trialcnt)+".csv"
+        outname = "output_PL_MLE_10Alternatives"+str(trialcnt)+".csv"
         out = open(outname, "w")
         writer = csv.writer(out)
         for key, value in result.items():
