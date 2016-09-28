@@ -20,7 +20,7 @@ if __name__ == '__main__':
     rslt_rt_mm = np.zeros((maxdatasize, 10), float)
     rslt_bt_mm = np.zeros((maxdatasize, 10), float)
     rslt_ot_mm = np.zeros((maxdatasize, 10), float)
-    for f in glob.glob("out3/*.csv"):
+    for f in glob.glob("data*.csv"):
         trialcnt += 1
         print("Trial: ", trialcnt)
         filename = open(f)
