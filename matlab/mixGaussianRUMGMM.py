@@ -64,10 +64,9 @@ def mixGauRUM_matlab(breaking):
         tolcon = 1e-6 #default -6 #optimal -9
 
         params_t0 = matlab.double(params_t0.tolist())
-        breaking = np.reshape(breaking, (1, m ** 2))
+        #breaking = np.reshape(breaking, (1, m ** 2))
         breaking = matlab.double(breaking.tolist())
         res, val, fl = matlabEng.optimize("mixGauRUMobj.mixGauRUMobj_mat", breaking, params_t0, A, b, Aeq, beq, lb, ub, {"Algorithm": "interior-point", "Display": "off","TolFun": tolfun, "TolX": tolx, "TolCon": tolcon}, nargout=3)
-        res = np.array(res[0])
 
         return res
 

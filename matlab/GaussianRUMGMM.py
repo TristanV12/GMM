@@ -34,14 +34,16 @@ def ddPrPair(x):
     return -x * np.exp(- x ** 2/4)/(4 * math.sqrt(math.pi))
 
 #calculate the breakings
-def dataBreaking(data, m, k, weights):
+def dataBreaking(data, m, k, weights = []):
     breaking = np.zeros((k, m, m), float)
+    weights = [[0]* m]*m
+    print(weights)
     n = len(data)
     for r in range(0, k):
         for j in range(0, n):
             for i1 in range(0, m):
                 for i2 in range(i1+1, m):
-                    breaking[r][data[j, i1]][data[j, i2]] += weights[r, j]
+                    breaking[r][1][1] += 1 #weights[r, j]
     return breaking
 
 def freqBreaking(weights, m, k):
