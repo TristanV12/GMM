@@ -2,10 +2,9 @@ import sys
 import time
 import numpy as np
 import scipy.stats
-import plackettluce as pl
+#import plackettluce as pl
 import stats as stats
 import mmgbtl as mm
-import gmmra as gmm
 import csv
 import glob
 import os
@@ -19,7 +18,7 @@ if __name__ == '__main__':
     rslt_rt_mm = np.zeros((maxdatasize, 10), float)
     rslt_bt_mm = np.zeros((maxdatasize, 10), float)
     rslt_ot_mm = np.zeros((maxdatasize, 10), float)
-    for f in glob.glob("data/dataUniform/*.csv"):
+    for f in glob.glob("*.csv"):
         trialcnt += 1
         print("Trial: ", trialcnt)
         filename = open(f)
@@ -52,7 +51,7 @@ if __name__ == '__main__':
             t_mm = time.perf_counter()
             gamma_mmfull, btime, otime = mmagg.aggregate(votes, mm_epsilon, mm_iters)
             t_mm = time.perf_counter() - t_mm
-            rslt_mm_full[:, j*10:(j+1)*10 ] = gamma_mmfull
+            rslt_mm_full[:, j*100:(j+1)*100 ] = gamma_mmfull
             gamma_mm = gamma_mmfull[-1]
             rslt_rt_mm[trialcnt-1,j] = t_mm
             rslt_bt_mm[trialcnt-1,j] = btime
@@ -61,8 +60,8 @@ if __name__ == '__main__':
                 rslt_mse_mm[itr, j] = stats.mse(gamma, gamma_mmfull[itr])
 
         print()
-        outnameMM_mse = "outputMM_mse/rslt_mm_mse_"+str(trialcnt)+".csv"
-        outnameMMfull = "outputMMfull/rslt_mm_est_"+str(trialcnt)+".csv"
+        outnameMM_mse = "rslt_mm_mse_"+str(trialcnt)+".csv"
+        outnameMMfull = "rslt_mm_est_"+str(trialcnt)+".csv"
         np.savetxt(outnameMM_mse, rslt_mse_mm, delimiter=',', newline="\r\n")
         np.savetxt(outnameMMfull, rslt_mm_full, delimiter=',', newline="\r\n")
     np.savetxt("mm_rt.csv", rslt_rt_mm, delimiter=',', newline="\r\n")

@@ -5,7 +5,6 @@ import scipy.stats
 import plackettluce as pl
 import stats as stats
 import mmpl as mm
-import gmmra as gmm
 import csv
 import glob
 import os
@@ -21,7 +20,7 @@ if __name__ == '__main__':
     #make sure data are in this directory
     #TODO raise an error if directory does not exist
 
-    for f in glob.glob("data/dataUniform/*.csv"):
+    for f in glob.glob("data*.csv"):
         trialcnt += 1
         print("Trial: ", trialcnt)
         filename = open(f)
@@ -54,7 +53,7 @@ if __name__ == '__main__':
             t_mm = time.perf_counter()
             gamma_mmfull = mmagg.aggregate(votes, mm_iters)
             t_mm = time.perf_counter() - t_mm
-            rslt_mm_full[:, j*10:(j+1)*10 ] = gamma_mmfull
+            rslt_mm_full[:, j*100:(j+1)*100 ] = gamma_mmfull
             gamma_mm = gamma_mmfull[-1]
             rslt_rt_mm[trialcnt-1,j] = t_mm
             for itr in range(0, mm_iters):
@@ -63,8 +62,8 @@ if __name__ == '__main__':
         print()
         #make sure these directories exist
         #TODO create directories if not exist
-        outnameMM_mse = "outputMMPL_mse/rslt_mm_mse_"+str(trialcnt)+".csv"
-        outnameMMfull = "outputMMPLfull/rslt_mm_est_"+str(trialcnt)+".csv"
+        outnameMM_mse = "rslt_mmpl_mse_"+str(trialcnt)+".csv"
+        outnameMMfull = "rslt_mmpl_est_"+str(trialcnt)+".csv"
         np.savetxt(outnameMM_mse, rslt_mse_mm, delimiter=',', newline="\r\n")
         np.savetxt(outnameMMfull, rslt_mm_full, delimiter=',', newline="\r\n")
     np.savetxt("mmpl_rt.csv", rslt_rt_mm, delimiter=',', newline="\r\n")
