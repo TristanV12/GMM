@@ -47,13 +47,14 @@ if __name__ == '__main__':
             alts = [i for i in range(m)]
             mmagg = mm.MM_PL(alts)
 
-            print("\b"*len(str(j*100)) + str((j+1)*100), end='')
+            print("\b"*len(str(j*10)) + str((j+1)*10), end='')
             sys.stdout.flush()
             votes = np.asarray(data[0:n])
             t_mm = time.perf_counter()
             gamma_mmfull = mmagg.aggregate(votes, mm_iters)
             t_mm = time.perf_counter() - t_mm
-            rslt_mm_full[:, j*100:(j+1)*100 ] = gamma_mmfull
+            print(rslt_mm_full)
+            rslt_mm_full[:, j*10:(j+1)*101 ] = gamma_mmfull
             gamma_mm = gamma_mmfull[-1]
             rslt_rt_mm[trialcnt-1,j] = t_mm
             for itr in range(0, mm_iters):
@@ -68,4 +69,4 @@ if __name__ == '__main__':
         np.savetxt(outnameMMfull, rslt_mm_full, delimiter=',', newline="\r\n")
     np.savetxt("mmpl_rt.csv", rslt_rt_mm, delimiter=',', newline="\r\n")
 
-        #break
+    #break

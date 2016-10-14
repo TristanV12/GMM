@@ -16,7 +16,7 @@ if __name__ == '__main__':
     trialcnt = 0
     #Make sure the data are in the following directory
     #TODO: create path if not exist
-    for f in glob.glob("data/dataUniform/*.csv"):
+    for f in glob.glob("*.csv"):
         trialcnt += 1
         print("Trial: ", trialcnt)
         filename = open(f)
@@ -31,7 +31,7 @@ if __name__ == '__main__':
         for itr in range(0, maxdatasize):
             data.append([ int(x) for x in next(reader)])
 
-        rslt_gmm = np.zeros((11, 14), float)
+        rslt_gmm = np.zeros((11, m + 4), float)
         rslt_gmm[0, 0:m] = gamma
 
         print("n =   ", end='')
@@ -63,6 +63,6 @@ if __name__ == '__main__':
         print()
         #make sure the following path exists before run this code
         #TODO creat directory if not exists
-        outnameGMM = "outputGMM/rslt_gmm_"+str(trialcnt)+".csv"
+        outnameGMM = "rslt_gmm_"+str(trialcnt)+".csv"
         np.savetxt(outnameGMM, rslt_gmm, delimiter=',', newline="\r\n")
         #break
