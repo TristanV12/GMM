@@ -28,17 +28,6 @@ def mse(mean, estimator):
         mean:      actual value (numpy ndarray)
         estimator: estimated value of the mean (numpy ndarray)
     """
-    return np.mean((np.asarray(estimator) - np.asarray(mean)) ** 2, axis=0)
-
-def sse(mean, estimator):
-    """
-    Description:
-        Calculates the Sum of Squared Errors (SSE) of
-        an estimation on flat numpy ndarrays.
-    Parameters:
-        mean:      actual value (numpy ndarray)
-        estimator: estimated value of the mean (numpy ndarray)
-    """
     return np.sum((np.asarray(estimator) - np.asarray(mean)) ** 2, axis=0)
 
 #deprecated
@@ -60,26 +49,6 @@ def mix2PL_mse(mean, estimator, m):
     estimator = np.hstack((1 - estimator[0], estimator[m+1:], estimator[1:m+1]))
     mse2 = mse(mean, estimator)
     return min(mse1, mse2)
-
-#deprecated
-def mix2PL_sse(mean, estimator, m):
-    """
-    Description:
-        Calculates the Sum of Squared Errors (SSE) of an
-        estimator of a mixture of 2 Plackett-Luce models,
-        on flat numpy ndarrays, where the first element is
-        the mixing proportion of the first model defined
-        as the minimum SSE over the inverse permutations of
-        the estimator.
-    Parameters:
-        mean:      actual value (numpy ndarray)
-        estimator: estimated value of the mean (numpy ndarray)
-        m:         number of alternatives in each of the two models
-    """
-    sse1 = sse(mean, estimator)
-    estimator = np.hstack((1 - estimator[0], estimator[m+1:], estimator[1:m+1]))
-    sse2 = sse(mean, estimator)
-    return min(sse1, sse2)
 
 #deprecated
 def mix2PL_wsse(mean, estimator, m):
