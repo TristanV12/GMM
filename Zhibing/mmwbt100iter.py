@@ -4,7 +4,7 @@ import numpy as np
 import scipy.stats
 import plackettluce as pl
 import stats as stats
-import mmpl as mm
+import mmwbt as mm
 import csv
 import glob
 import os
@@ -13,13 +13,10 @@ import os
 if __name__ == '__main__':
     maxdatasize = 1000
     mm_iters = 100
-    mm_epsilon = None
     trialcnt = 0
     rslt_rt_mm = np.zeros((maxdatasize, 10), float)
-
-    #make sure data are in this directory
-    #TODO raise an error if directory does not exist
-
+    rslt_bt_mm = np.zeros((maxdatasize, 10), float)
+    rslt_ot_mm = np.zeros((maxdatasize, 10), float)
     for f in glob.glob("*.csv"):
         trialcnt += 1
         print("Trial: ", trialcnt)
@@ -36,7 +33,7 @@ if __name__ == '__main__':
 
         rslt_mse_mm = np.zeros((mm_iters, 10), float)
 
-        rslt_mm_full = np.zeros((mm_iters, (m+1) * 10), float)
+        rslt_mm_full = np.zeros((mm_iters, m * 10), float)
 
         print("n =   ", end='')
         sys.stdout.flush()
@@ -45,28 +42,28 @@ if __name__ == '__main__':
             n = (j + 1) * 100
 
             alts = [i for i in range(m)]
-            mmagg = mm.MM_PL(alts)
+            mmagg = mm.MMwBTAggregator(alts)
 
             print("\b"*len(str(j*100)) + str((j+1)*100), end='')
             sys.stdout.flush()
             votes = np.asarray(data[0:n])
             t_mm = time.perf_counter()
-            gamma_mmfull = mmagg.aggregate(votes, mm_iters)
-            print("hid")
+            gamma_mmfull, btime, otime = mmagg.aggregate(votes, mm_iters)
             t_mm = time.perf_counter() - t_mm
-            rslt_mm_full[:, j*(m+1):(j+1)*(m+1) ] = gamma_mmfull
-            gamma_mm = gamma_mmfull[-1,0:m]
+            rslt_mm_full[:, j*m:(j+1)*m ] = gamma_mmfull
+            gamma_mm = gamma_mmfull[-1]
             rslt_rt_mm[trialcnt-1,j] = t_mm
+            rslt_bt_mm[trialcnt-1,j] = btime
+            rslt_ot_mm[trialcnt-1,j] = otime
             for itr in range(0, mm_iters):
-                rslt_mse_mm[itr, j] = stats.mse(gamma, gamma_mmfull[itr,0:m])
+                rslt_mse_mm[itr, j] = stats.mse(gamma, gamma_mmfull[itr])
 
         print()
-        #make sure these directories exist
-        #TODO create directories if not exist
         outnameMM_mse = "rslt_mm_mse_"+str(trialcnt)+".csv"
         outnameMMfull = "rslt_mm_est_"+str(trialcnt)+".csv"
         np.savetxt(outnameMM_mse, rslt_mse_mm, delimiter=',', newline="\r\n")
         np.savetxt(outnameMMfull, rslt_mm_full, delimiter=',', newline="\r\n")
-    np.savetxt("mmpl_rt.csv", rslt_rt_mm, delimiter=',', newline="\r\n")
-
+    np.savetxt("mmwbt_rt_dir.csv", rslt_rt_mm, delimiter=',', newline="\r\n")
+    np.savetxt("mmwbt_bt_dir.csv", rslt_bt_mm, delimiter=',', newline="\r\n")
+    np.savetxt("mmwbt_ot_dir.csv", rslt_ot_mm, delimiter=',', newline="\r\n")
         #break
